@@ -3,12 +3,17 @@
  */
 package com.imooc.web.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.imooc.security.core.properties.SecurityProperties;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +55,9 @@ public class UserController {
 	
 	@Autowired
 	private AppSingUpUtils appSingUpUtils;
+
+	@Autowired
+	private SecurityProperties securityProperties;
 	
 	@PostMapping("/regist")
 	public void regist(User user, HttpServletRequest request) {
@@ -63,7 +71,14 @@ public class UserController {
 	@GetMapping("/me")
 	//public Object getCurrentUser(@AuthenticationPrincipal UserDetails user) {
 	// 使用jwt访问的时候要改成Authentication user，要不然访问不到
-	public Object getCurrentUser(Authentication user) {
+	public Object getCurrentUser(Authentication user, HttpServletRequest request) throws UnsupportedEncodingException {
+		// 解析jwt内容
+		// jwt加密的时候使用的Spring中的方式，编码方式是utf-8，但是解析的时候默认不是utf-8所以要进行转码
+		String token = StringUtils.substringAfter(request.getHeader("Authorization"), "bearer ");
+		Claims claims = Jwts.parser().setSigningKey(securityProperties.getOauth2().getJwtSigningKey().getBytes("UTF-8"))
+				.parseClaimsJws(token).getBody();
+		String company = (String) claims.get("company");
+		System.out.println(company);
 		return user;
 	}
 
