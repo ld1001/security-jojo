@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 
 import com.imooc.security.core.properties.OAuth2ClientProperties;
 import com.imooc.security.core.properties.SecurityProperties;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 /**
  * @author zhailiang
@@ -38,12 +39,18 @@ public class ImoocAuthorizationServerConfig extends AuthorizationServerConfigure
 	@Autowired
 	private SecurityProperties securityProperties;
 
+	@Autowired
+	private JwtAccessTokenConverter jwtAccessTokenConverter;
+
 	// endpoints是处理token的入口，所以设置相关配置要在这里设置
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 		endpoints.tokenStore(tokenStore)
 				.authenticationManager(authenticationManager)
 				.userDetailsService(userDetailsService);
+		if (jwtAccessTokenConverter != null) {
+			endpoints.accessTokenConverter(jwtAccessTokenConverter);
+		}
 	}
 
 	// 第三方应用相关配置，重写了这个方法，下面的配置就不起作用了

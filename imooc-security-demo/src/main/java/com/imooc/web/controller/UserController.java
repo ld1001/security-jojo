@@ -14,6 +14,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.social.connect.web.ProviderSignInUtils;
@@ -60,7 +61,9 @@ public class UserController {
 	}
 	
 	@GetMapping("/me")
-	public Object getCurrentUser(@AuthenticationPrincipal UserDetails user) {
+	//public Object getCurrentUser(@AuthenticationPrincipal UserDetails user) {
+	// 使用jwt访问的时候要改成Authentication user，要不然访问不到
+	public Object getCurrentUser(Authentication user) {
 		return user;
 	}
 
